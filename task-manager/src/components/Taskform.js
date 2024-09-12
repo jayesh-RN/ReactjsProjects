@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { TaskList } from "./TaskList";
 
 export const Taskform = () => {
   const [add, setAdd] = useState({});
@@ -11,26 +12,30 @@ export const Taskform = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     if (!add) return;
-    const updatedTasks = [...task, add];
+    const oldTask = localStorage.getItem("task");
+    const oT = oldTask ? JSON.parse(oldTask) : [];
+    const updatedTasks = [...oT, add];
     setTask(updatedTasks);
     setAdd("");
     localStorage.setItem("task", JSON.stringify(updatedTasks));
     alert("Data saved to localStorage!");
   };
 
-  const onDelete = (index) => {
-    const updatedTasks = task.filter((item, i) => i !== index);
-    setTask(updatedTasks);
-    localStorage.setItem("task", JSON.stringify(updatedTasks));
-  };
+    const onDelete = (index) => {
+      console.log(index);
+      const updatedTasks = task.filter((item, i) => i !== index);
+      setTask(updatedTasks);
+      console.log(updatedTasks);
+      localStorage.setItem("task", JSON.stringify(updatedTasks));
+    };
 
-  const onToggle = (index) => {
-    const updatedTasks = task.map((item, i) =>
-      i === index ? { ...item, status: !item.status } : item
-    );
-    setTask(updatedTasks);
-    localStorage.setItem("task", JSON.stringify(updatedTasks));
-  };
+    const onToggle = (index) => {
+      const updatedTasks = task.map((item, i) =>
+        i === index ? { ...item, status: !item.status } : item
+      );
+      setTask(updatedTasks);
+      localStorage.setItem("task", JSON.stringify(updatedTasks));
+    };
 
   return (
     <>
@@ -44,28 +49,11 @@ export const Taskform = () => {
         />
         <button type="submit">Add Task</button>
       </form>
-      <ul>
-        {task.map((item, index) => (
-          <li key={index}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                width: "60%",
-                border: "1px solid black",
-                justifyContent: "space-around",
-              }}
-            >
-              <div>{item.task}</div>
-
-              {item.status ? <p>completed</p> : <p>pending</p>}
-              {/* {console.log(item, index)} */}
-              <button onClick={() => onDelete(index)}>Delete</button>
-              <button onClick={() => onToggle(index)}>Toggle status</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <TaskList
+        task={task}
+        onDelete={onDelete}
+        onToggle={onToggle}
+      />
     </>
   );
 };
